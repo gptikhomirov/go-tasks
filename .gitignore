@@ -1,0 +1,35 @@
+# Скомпилированные бинарники
+# (часто игнорят по имени проекта или папку bin/)
+/bin/
+/build/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Артефакты тестов
+*.test
+*.out
+coverage.out
+coverage.html
+
+# Go workspace (если используешь go.work локально)
+go.work
+go.work.sum
+
+# Зависимости вендоринга — игнорят, ТОЛЬКО если не используешь vendor/
+# vendor/
+
+# Переменные окружения и секреты
+.env
+.env.local
+*.local
+
+# IDE
+.idea/
+.vscode/
+
+# ОС
+.DS_Store
+Thumbs.db
