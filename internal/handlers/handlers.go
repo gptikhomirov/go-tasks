@@ -32,9 +32,9 @@ func respondWithError(w http.ResponseWriter, statusCode int, message string) {
 	respondWithJSON(w, statusCode, map[string]string{"error": message})
 }
 
-func getIdFromUrl(urlPath string) (int, error) {
-	pathParts := strings.Split(strings.TrimPrefix(urlPath, "/tasks/"), "/")
-	return strconv.Atoi(pathParts[0])
+// taskIDFromRequest достаёт {id} из пути, который ServeMux уже распарсил.
+func taskIDFromRequest(r *http.Request) (int, error) {
+	return strconv.Atoi(r.PathValue("id"))
 }
 
 // /Utils
@@ -50,7 +50,7 @@ func (h *Handler) GetAllTasks(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
-	id, err := getIdFromUrl(r.URL.Path)
+	id, err := taskIDFromRequest(r)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Некорректный id задачи")
 		return
@@ -92,7 +92,7 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
-	id, err := getIdFromUrl(r.URL.Path)
+	id, err := taskIDFromRequest(r)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Некорректный id задачи")
 		return
@@ -125,7 +125,7 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
-	id, err := getIdFromUrl(r.URL.Path)
+	id, err := taskIDFromRequest(r)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Некорректный id задачи")
 		return

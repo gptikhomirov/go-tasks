@@ -33,13 +33,11 @@ func main() {
 	handler := handlers.NewHandler(taskStore)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/tasks", methodHandler(handler.GetAllTasks, http.MethodGet))
-	mux.HandleFunc("/tasks/create", methodHandler(handler.CreateTask, http.MethodPost))
-	//mux.HandleFunc("/tasks/:id", methodHandler(handler.GetTask, http.MethodGet))
-	//mux.HandleFunc("/tasks/:id", methodHandler(handler.UpdateTask, http.MethodPut))
-	//mux.HandleFunc("/tasks/:id", methodHandler(handler.DeleteTask, http.MethodDelete))
-
-	mux.HandleFunc("/tasks/", taskIDHandler(handler))
+	mux.HandleFunc("GET /tasks", handler.GetAllTasks)
+	mux.HandleFunc("POST /tasks", handler.CreateTask)
+	mux.HandleFunc("GET /tasks/{id}", handler.GetTask)
+	mux.HandleFunc("PUT /tasks/{id}", handler.UpdateTask)
+	mux.HandleFunc("DELETE /tasks/{id}", handler.DeleteTask)
 
 	loggedMux := loggingMiddleware(mux)
 
@@ -52,32 +50,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-}
-
-func methodHandler(handlerFunc http.HandlerFunc, allowedMethod string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != allowedMethod {
-			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-			return
-		}
-
-		handlerFunc(w, r)
-	}
-}
-
-func taskIDHandler(handler *handlers.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			handler.GetTask(w, r)
-		case http.MethodPut:
-			handler.UpdateTask(w, r)
-		case http.MethodDelete:
-			handler.DeleteTask(w, r)
-		default:
-			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		}
-	}
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {
