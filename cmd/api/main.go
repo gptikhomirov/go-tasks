@@ -58,6 +58,7 @@ func methodHandler(handlerFunc http.HandlerFunc, allowedMethod string) http.Hand
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != allowedMethod {
 			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
 		}
 
 		handlerFunc(w, r)

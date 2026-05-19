@@ -17,8 +17,8 @@ func NewTaskStore(db *sqlx.DB) *TaskStore {
 	return &TaskStore{db: db}
 }
 
-func (s *TaskStore) GetAll() ([]models.Task, error) {
-	var tasks []models.Task
+func (s *TaskStore) GetAll() ([]models.TaskListItem, error) {
+	var tasks []models.TaskListItem
 
 	query := `
 		SELECT title, description, completed, created_at 
