@@ -8,17 +8,18 @@ import (
 	"os"
 )
 
+// TODO: env
 func main() {
-	databaseUrl := os.Getenv("DATABASE_URL")
-	if databaseUrl == "" {
-		databaseUrl = "postgres://tasks_user:password@localhost:5432/tasks_db?sslmode=disable"
-	}
-
 	serverPort := os.Getenv("SERVER_PORT")
 	if serverPort == "" {
 		serverPort = "8080"
 	}
 	log.Printf("Starting server on port %s", serverPort)
+
+	databaseUrl := os.Getenv("DATABASE_URL")
+	if databaseUrl == "" {
+		databaseUrl = "postgres://tasks_user:password@localhost:5432/tasks_db?sslmode=disable"
+	}
 
 	db, err := database.Connect(databaseUrl)
 	if err != nil {

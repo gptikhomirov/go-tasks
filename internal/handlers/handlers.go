@@ -17,6 +17,7 @@ func NewHandler(store *database.TaskStore) *Handler {
 	return &Handler{store: store}
 }
 
+// Utils
 func respondWithJSON(w http.ResponseWriter, statusCode int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
@@ -30,6 +31,13 @@ func respondWithError(w http.ResponseWriter, statusCode int, message string) {
 	respondWithJSON(w, statusCode, map[string]string{"error": message})
 }
 
+func getIdFromUrl(urlPath string) (int, error) {
+	pathParts := strings.Split(strings.TrimPrefix(urlPath, "/tasks/"), "/")
+	return strconv.Atoi(pathParts[0])
+}
+
+// /Utils
+
 func (h *Handler) GetAllTasks(w http.ResponseWriter, r *http.Request) {
 	tasks, err := h.store.GetAll()
 	if err != nil {
@@ -41,8 +49,7 @@ func (h *Handler) GetAllTasks(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
-	pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/tasks/"), "/")
-	id, err := strconv.Atoi(pathParts[0])
+	id, err := getIdFromUrl(r.URL.Path)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Некорректный id задачи")
 		return
@@ -80,8 +87,7 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
-	pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/tasks/"), "/")
-	id, err := strconv.Atoi(pathParts[0])
+	id, err := getIdFromUrl(r.URL.Path)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Некорректный id задачи")
 		return
@@ -114,8 +120,7 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
-	pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/tasks/"), "/")
-	id, err := strconv.Atoi(pathParts[0])
+	id, err := getIdFromUrl(r.URL.Path)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Некорректный id задачи")
 		return
