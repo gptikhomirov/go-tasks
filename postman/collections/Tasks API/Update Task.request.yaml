@@ -1,0 +1,17 @@
+$kind: http-request
+name: Update Task
+method: PUT
+url: '{{baseUrl}}/tasks/1'
+description: Updates an existing task by ID. All fields are optional.
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Updated task title",
+      "description": "Updated description",
+      "completed": true
+    }

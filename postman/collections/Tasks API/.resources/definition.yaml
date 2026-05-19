@@ -1,0 +1,6 @@
+$kind: collection
+name: Tasks API
+description: Collection for the Tasks API - manage tasks with CRUD operations.
+variables:
+  - key: baseUrl
+    value: 'http://localhost:8080'

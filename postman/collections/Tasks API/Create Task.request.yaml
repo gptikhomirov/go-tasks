@@ -1,0 +1,17 @@
+$kind: http-request
+name: Create Task
+method: POST
+url: '{{baseUrl}}/tasks/create'
+description: 'Creates a new task. `title` is required.'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "My new task",
+      "description": "Task description",
+      "completed": false
+    }
