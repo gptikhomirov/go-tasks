@@ -2,12 +2,15 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"go-start/internal/models"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 )
+
+var ErrTaskNotFound = errors.New("task not found")
 
 type TaskStore struct {
 	db *sqlx.DB
@@ -45,8 +48,8 @@ func (s *TaskStore) GetByID(id int) (*models.Task, error) {
 
 	err := s.db.Get(&task, query, id)
 
-	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf(`task with id %d not found`, id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, fmt.Errorf("task with id %d: %w", id, ErrTaskNotFound)
 	}
 
 	if err != nil {
@@ -121,7 +124,7 @@ func (s *TaskStore) Delete(id int) error {
 	}
 
 	if rows == 0 {
-		return fmt.Errorf(`task with id %d not found`, id)
+		return fmt.Errorf("task with id %d: %w", id, ErrTaskNotFound)
 	}
 
 	return nil

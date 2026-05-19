@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"go-start/internal/database"
 	"go-start/internal/models"
 	"net/http"
@@ -57,7 +58,11 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 
 	task, err := h.store.GetByID(id)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, err.Error())
+		if errors.Is(err, database.ErrTaskNotFound) {
+			respondWithError(w, http.StatusNotFound, err.Error())
+		} else {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
 		return
 	}
 
@@ -107,7 +112,7 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 
 	task, err := h.store.Update(id, input)
 	if err != nil {
-		if strings.Contains(err.Error(), "record not found") {
+		if errors.Is(err, database.ErrTaskNotFound) {
 			respondWithError(w, http.StatusNotFound, err.Error())
 		} else {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -128,7 +133,11 @@ func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 	err = h.store.Delete(id)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		if errors.Is(err, database.ErrTaskNotFound) {
+			respondWithError(w, http.StatusNotFound, err.Error())
+		} else {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
 		return
 	}
 
