@@ -18,7 +18,7 @@ func NewHandler(store *database.TaskStore) *Handler {
 }
 
 // Utils
-func respondWithJSON(w http.ResponseWriter, statusCode int, payload interface{}) {
+func respondWithJSON(w http.ResponseWriter, statusCode int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	err := json.NewEncoder(w).Encode(payload)
@@ -132,5 +132,5 @@ func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+	respondWithJSON(w, http.StatusNoContent, map[string]string{"result": "success"})
 }

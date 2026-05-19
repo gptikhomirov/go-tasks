@@ -38,7 +38,7 @@ func (s *TaskStore) GetByID(id int) (*models.Task, error) {
 	var task models.Task
 
 	query := `
-		SELECT title, description, completed, created_at, updated_at
+		SELECT id, title, description, completed, created_at, updated_at
 		FROM tasks
 		WHERE id = $1;
 	`
@@ -97,13 +97,14 @@ func (s *TaskStore) Update(id int, input models.UpdateTaskInput) (*models.Task, 
 		WHERE id = $5
 		RETURNING id, title, description, completed, created_at, updated_at;
 	`
+
 	var updatedTask models.Task
 	err = s.db.QueryRowx(query, task.Title, task.Description, task.Completed, task.UpdatedAt, task.ID).StructScan(&updatedTask)
 	if err != nil {
 		return nil, err
 	}
 
-	return task, nil
+	return &updatedTask, nil
 }
 
 func (s *TaskStore) Delete(id int) error {
