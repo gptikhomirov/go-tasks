@@ -1,21 +1,28 @@
 package main
 
 import (
-	"go-start/internal/database"
-	"go-start/internal/handlers"
+	"go-rest/internal/database"
+	"go-rest/internal/handlers"
 	"log"
 	"net/http"
 	"os"
 )
 
-// TODO: env
-func main() {
+const (
+	defaultPort = "8080"
+)
+
+func getPort() string {
 	serverPort := os.Getenv("SERVER_PORT")
 	if serverPort == "" {
-		serverPort = "8080"
+		return defaultPort
 	}
-	log.Printf("Starting server on port %s", serverPort)
 
+	return serverPort
+}
+
+// TODO: env
+func main() {
 	databaseUrl := os.Getenv("DATABASE_URL")
 	if databaseUrl == "" {
 		databaseUrl = "postgres://tasks_user:password@localhost:5432/tasks_db?sslmode=disable"
@@ -43,13 +50,14 @@ func main() {
 
 	// TODO: cors middleware
 
+	serverPort := getPort()
+	log.Printf("Starting server on port %s", serverPort)
 	serverAddr := ":" + serverPort
 
 	err = http.ListenAndServe(serverAddr, loggedMux)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {

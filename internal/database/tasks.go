@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"go-start/internal/models"
+	"go-rest/internal/models"
 	"time"
 
 	"github.com/jmoiron/sqlx"

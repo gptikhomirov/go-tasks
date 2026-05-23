@@ -1,4 +1,4 @@
-module go-start
+module go-rest
 
 go 1.26.3
 

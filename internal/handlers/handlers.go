@@ -3,8 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"go-start/internal/database"
-	"go-start/internal/models"
+	"go-rest/internal/database"
+	"go-rest/internal/models"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -24,7 +25,8 @@ func respondWithJSON(w http.ResponseWriter, statusCode int, payload any) {
 	w.WriteHeader(statusCode)
 	err := json.NewEncoder(w).Encode(payload)
 	if err != nil {
-		panic(err)
+		// Заголовки и статус уже отправлены — ответ не исправить, только логируем.
+		log.Printf("encode response: %v", err)
 	}
 }
 
