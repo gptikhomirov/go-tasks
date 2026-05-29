@@ -21,13 +21,23 @@ func NewTaskStore(db *sqlx.DB) *TaskStore {
 }
 
 func (s *TaskStore) GetAll(params models.GetAllParams) ([]models.TaskListItem, error) {
-	var tasks []models.TaskListItem
+	tasks := []models.TaskListItem{}
+
+	var (
+		args  []any
+		where string
+	)
+
+	if params.Search != "" {
+		where = "WHERE title ILIKE $1 OR description ILIKE $1"
+		args = append(args, "%"+params.Search+"%")
+	}
 
 	query := `
-		SELECT title, description, completed, created_at
-		FROM tasks
-		WHERE title ILIKE $1
-		ORDER BY created_at DESC;
+    	SELECT title, description, completed, created_at
+    	FROM tasks
+	` + where + `
+    	ORDER BY created_at DESC
 	`
 
 	err := s.db.Select(&tasks, query, params.Search)
