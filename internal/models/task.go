@@ -29,3 +29,7 @@ type UpdateTaskInput struct {
 	Description *string `json:"description"`
 	Completed   *bool   `json:"completed"`
 }
+
+type GetAllParams struct {
+	Search string
+}

@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"go-rest/internal/database"
 	"go-rest/internal/models"
 	"log"
@@ -41,9 +42,23 @@ func taskIDFromRequest(r *http.Request) (int, error) {
 
 // /Utils
 
+func buildGetAllParams(r *http.Request) models.GetAllParams {
+	query := r.URL.Query()
+	searchValue := "%" + strings.TrimSpace(query.Get("search")) + "%"
+
+	fmt.Println("here", searchValue)
+
+	return models.GetAllParams{
+		Search: searchValue,
+	}
+}
+
 func (h *Handler) GetAllTasks(w http.ResponseWriter, r *http.Request) {
-	tasks, err := h.store.GetAll()
+	getAllParams := buildGetAllParams(r)
+
+	tasks, err := h.store.GetAll(getAllParams)
 	if err != nil {
+		log.Printf("get all tasks: %v", err) // ← добавь
 		respondWithError(w, http.StatusInternalServerError, "Ошибка получения задач")
 		return
 	}

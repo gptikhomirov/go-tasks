@@ -20,16 +20,17 @@ func NewTaskStore(db *sqlx.DB) *TaskStore {
 	return &TaskStore{db: db}
 }
 
-func (s *TaskStore) GetAll() ([]models.TaskListItem, error) {
+func (s *TaskStore) GetAll(params models.GetAllParams) ([]models.TaskListItem, error) {
 	var tasks []models.TaskListItem
 
 	query := `
-		SELECT title, description, completed, created_at 
-		FROM tasks 
+		SELECT title, description, completed, created_at
+		FROM tasks
+		WHERE title ILIKE $1
 		ORDER BY created_at DESC;
 	`
 
-	err := s.db.Select(&tasks, query)
+	err := s.db.Select(&tasks, query, params.Search)
 	if err != nil {
 		return nil, err
 	}
