@@ -32,4 +32,18 @@ type UpdateTaskInput struct {
 
 type GetAllParams struct {
 	Search string
+	Limit  int
+	Offset int
+}
+
+type Pagination struct {
+	Limit      int `json:"limit"`
+	Offset     int `json:"offset"`
+	Total      int `json:"total"`
+	TotalPages int `json:"total_pages"`
+}
+
+type GetAllResponse struct {
+	Pagination
+	Data []TaskListItem `json:"data"`
 }

@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"go-rest/internal/database"
 	"go-rest/internal/models"
 	"log"
@@ -44,12 +43,14 @@ func taskIDFromRequest(r *http.Request) (int, error) {
 
 func buildGetAllParams(r *http.Request) models.GetAllParams {
 	query := r.URL.Query()
-	searchValue := "%" + strings.TrimSpace(query.Get("search")) + "%"
-
-	fmt.Println("here", searchValue)
+	searchValue := strings.TrimSpace(query.Get("search"))
+	limitValue, _ := strconv.Atoi(query.Get("limit"))
+	offsetValue, _ := strconv.Atoi(query.Get("offset"))
 
 	return models.GetAllParams{
 		Search: searchValue,
+		Limit:  limitValue,
+		Offset: offsetValue,
 	}
 }
 

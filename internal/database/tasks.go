@@ -20,32 +20,73 @@ func NewTaskStore(db *sqlx.DB) *TaskStore {
 	return &TaskStore{db: db}
 }
 
-func (s *TaskStore) GetAll(params models.GetAllParams) ([]models.TaskListItem, error) {
+const (
+	minLimit     = 1
+	maxLimit     = 100
+	defaultLimit = 10
+)
+
+func (s *TaskStore) GetAll(params models.GetAllParams) (models.GetAllResponse, error) {
 	tasks := []models.TaskListItem{}
 
 	var (
-		args  []any
-		where string
+		args      []any
+		whereArgs []any
+		where     string
+		limit     string
+		offset    string
 	)
+	argsN := 1
+	_limit := defaultLimit
+	_offset := 0
+	_total := 0
 
 	if params.Search != "" {
-		where = "WHERE title ILIKE $1 OR description ILIKE $1"
+		where = fmt.Sprintf("WHERE title ILIKE $%d OR description ILIKE $%d", argsN, argsN)
 		args = append(args, "%"+params.Search+"%")
+		whereArgs = append(whereArgs, "%"+params.Search+"%")
+		argsN++
 	}
+
+	if params.Limit >= minLimit && params.Limit < maxLimit {
+		_limit = params.Limit
+	}
+	limit = fmt.Sprintf("LIMIT $%d", argsN)
+	args = append(args, _limit)
+	argsN++
+
+	if params.Offset > 0 {
+		_offset = params.Offset
+	}
+	offset = fmt.Sprintf("OFFSET $%d", argsN)
+	args = append(args, _offset)
+	argsN++
 
 	query := `
     	SELECT title, description, completed, created_at
     	FROM tasks
 	` + where + `
     	ORDER BY created_at DESC
-	`
+	` + limit + ` ` + offset + `;`
 
-	err := s.db.Select(&tasks, query, params.Search)
+	err := s.db.Select(&tasks, query, args...)
 	if err != nil {
-		return nil, err
+		return models.GetAllResponse{}, err
 	}
 
-	return tasks, nil
+	totalQuery := `SELECT count(*) FROM tasks ` + where
+	err = s.db.Get(&_total, totalQuery, whereArgs...)
+	if err != nil {
+		return models.GetAllResponse{}, err
+	}
+
+	response := models.GetAllResponse{Data: tasks}
+	response.Limit = _limit
+	response.Offset = _offset
+	response.Total = _total
+	response.TotalPages = (_total + _limit - 1) / _limit
+
+	return response, nil
 }
 
 func (s *TaskStore) GetByID(id int) (*models.Task, error) {
